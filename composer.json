@@ -1,0 +1,24 @@
+{
+    "name": "nserdashenko/mediocre-package",
+    "description": "Mediocre package (DI, Router, CLI, MysqlDriver, Migrations)",
+    "type": "package",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Mediocre\\": "src/",
+            "Mediocre\\": "src/"
+        }
+    },
+   "minimum-stability": "alpha",
+   "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Nikita Serdashenko",
+            "email": "serdasheko@mail.ru"
+        }
+    ],
+    "require": {
+      "php": ">=8.1",
+      "ext-pdo": "*"
+    }
+}
