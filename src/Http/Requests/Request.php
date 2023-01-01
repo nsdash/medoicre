@@ -20,12 +20,16 @@ final class Request implements Singleton
 
   public function all(): array
   {
-    return array_merge($_GET, $_POST);
+    $jsonBody = $this->getJsonData();
+
+    return array_merge($_GET, $_POST, $jsonBody);
   }
 
   public function get(string $key): mixed
   {
-    return $_GET[$key] ?? $_POST[$key] ?? null;
+    $data = $this->all();
+
+    return $data[$key] ?? null;
   }
 
   public function file(string $key): mixed
@@ -104,5 +108,25 @@ final class Request implements Singleton
     $header = str_replace('_', ' ', strtolower(substr($header, 5)));
 
     return str_replace(' ', '-', ucwords($header));
+  }
+
+  public function isJson(): bool
+  {
+    return $this->getHeader('Content-Type') === 'application/json';
+  }
+
+  private function getJsonData(): array
+  {
+    if (!$this->isJson()) {
+      return [];
+    }
+
+    $input = file_get_contents('php://input');
+
+    try {
+      return json_decode($input, true, 512, JSON_THROW_ON_ERROR);
+    } catch (\JsonException $e) {
+      throw new BadRequestHttpException('Invalid Json provided');
+    }
   }
 }

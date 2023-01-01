@@ -6,6 +6,7 @@ namespace Mediocre\Http\Requests;
 
 use Mediocre\Http\Contracts\MiddlewareInterface;
 use Mediocre\Http\Contracts\ResponseInterface;
+use Mediocre\Http\Responses\JsonResponse;
 use Mediocre\Http\Responses\Response;
 use Mediocre\Http\Router\Contracts\RouterInterface;
 use Mediocre\Http\Router\Dto\RouteItem;
@@ -28,9 +29,27 @@ final class RequestResolver
   {
     $request = Request::init();
 
-    $route = $router->getItem($request->getUri());
+    if ($request->getHttpMethod() === 'OPTIONS') {
+      return $this->optionsResponse($request, $router);
+    }
 
-    $this->checkMethod($route, $request);
+    return $this->routerResponse($request, $router);
+  }
+
+  private function optionsResponse(Request $request, RouterInterface $router): ResponseInterface
+  {
+    $methods = implode(',', $router->getItemMethods($request->getUri()) ?? []);
+
+    return new JsonResponse(null, 200, array_merge([
+        "Access-Control-Allow-Methods:$methods",
+      ], config('cors')
+      )
+    );
+  }
+
+  private function routerResponse(Request $request, RouterInterface $router): ResponseInterface
+  {
+    $route = $router->getItem($request->getUri(), $request->getHttpMethod());
 
     $this->handleMiddleware($route, $request);
 
@@ -38,26 +57,20 @@ final class RequestResolver
       ->resolveMethod($route->getClass(), $route->getMethod());
 
     if ($data instanceof ResponseInterface) {
+
       return $data;
     }
 
     return new Response($data);
   }
 
-  /** @throws WrongHttpMethodException */
-  private function checkMethod(RouteItem $route, Request $request): void
-  {
-    if ($route->getHttpMethod() !== $request->getHttpMethod()) {
-      throw new WrongHttpMethodException('Wrong HTTP Method');
-    }
-  }
 
   /** @throws ReflectionException */
   private function handleMiddleware(RouteItem $route, Request $request): void
   {
     $middlewareClass = $route->getMiddlewareClass();
 
-    if(!$middlewareClass) {
+    if (!$middlewareClass) {
       return;
     }
 

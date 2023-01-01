@@ -13,6 +13,8 @@ final class JsonResponse extends Response
     protected readonly int $status = 200,
     array $headers = [],
   ) {
-    $this->headers[] = 'Content-Type: application/json';
+    $headers = array_merge(config('cors') ?? [], ['Content-Type: application/json'], $headers);
+
+    $this->headers = $headers;
   }
 }

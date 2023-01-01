@@ -22,7 +22,7 @@ final class BadRequestHttpException extends Exception
   public static function withDetails(
     array $details,
     string $message = '',
-    int $code = 0,
+    int $code = 1,
     ?Throwable $previous = null
   ): BadRequestHttpException
   {

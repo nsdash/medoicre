@@ -9,11 +9,10 @@ use Mediocre\Http\Contracts\ResponseInterface;
 
 class Response implements ResponseInterface
 {
-  protected array $headers = [];
-
   public function __construct(
     protected readonly mixed $content,
     protected readonly int $status = 200,
+    protected array $headers = []
   ) {
   }
 
@@ -49,6 +48,4 @@ class Response implements ResponseInterface
   {
     return $this->headers;
   }
-
-
 }

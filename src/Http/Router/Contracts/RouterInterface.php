@@ -6,7 +6,9 @@ use Mediocre\Http\Router\Dto\RouteItem;
 
 interface RouterInterface
 {
-  public function getItem(string $url): RouteItem;
+  public function getItem(string $url, string $methodName): RouteItem;
+
+  public function getItemMethods(string $url): ?array;
 
   public function get(string $url, string $className, string $methodName): RouteItem;
 

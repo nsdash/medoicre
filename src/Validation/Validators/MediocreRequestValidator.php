@@ -43,6 +43,12 @@ abstract class MediocreRequestValidator
 
   protected function checkString(string $field, ?string $message = null): void
   {
+    $value = $this->request->get($field);
+
+    if (is_null($value)) {
+      return;
+    }
+
     if (is_string($this->request->get($field))) {
       return;
     }
@@ -52,6 +58,12 @@ abstract class MediocreRequestValidator
 
   protected function checkNumeric(string $field, ?string $message = null): void
   {
+    $value = $this->request->get($field);
+
+    if (is_null($value)) {
+      return;
+    }
+
     if (is_numeric($this->request->get($field))) {
       return;
     }
@@ -61,6 +73,12 @@ abstract class MediocreRequestValidator
 
   protected function checkBool(string $field, ?string $message = null): void
   {
+    $value = $this->request->get($field);
+
+    if (is_null($value)) {
+      return;
+    }
+
     if (is_bool($this->request->get($field))) {
       return;
     }
@@ -70,7 +88,19 @@ abstract class MediocreRequestValidator
 
   protected function checkLength(string $field, int $count, ?string $message = null): void
   {
-    if (is_bool($this->request->get($field))) {
+    $value = $this->request->get($field);
+
+    if (is_iterable($value) || is_countable($value)) {
+      if (count($value) <= $count) {
+        return;
+      }
+
+      $this->errors[$field][] = $message ?? "Field $field must be bool";
+
+      return;
+    }
+
+    if (strlen((string) $value) <= $count) {
       return;
     }
 

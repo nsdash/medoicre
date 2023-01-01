@@ -35,6 +35,8 @@ final class QueryBuilder
 
     $this->setBindings($query);
 
+    $this->bindings = [];
+
     $query->execute();
 
     return $query;

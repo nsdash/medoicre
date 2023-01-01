@@ -21,25 +21,25 @@ class WebHandler implements WebHandlerInterface
   {
     try {
       return $callback();
-    } catch (ItemNotFoundException) {
+    } catch (ItemNotFoundException $exception) {
       return new JsonResponse(
-        traceError(404, 'Page not found', null, null),
+        traceError($exception->getCode(), 'Page not found', null, null),
         404,
       );
-    } catch (WrongHttpMethodException) {
+    } catch (WrongHttpMethodException $exception) {
       return new JsonResponse(
-        traceError(405, 'Wrong Http Method', null, null),
+        traceError($exception->getCode(), 'Wrong Http Method', null, null),
         405,
       );
     } catch (DomainException $exception) {
       return new JsonResponse(
-        traceError(422, $exception->getMessage(), null, null),
+        traceError($exception->getCode(), $exception->getMessage(), null, null),
         422,
       );
     } catch (BadRequestHttpException|AssertException $exception) {
       return new JsonResponse(
         traceError(
-          400,
+          $exception->getCode(),
             $exception->getMessage() ?? 'Bad Request',
           null,
           null,
@@ -47,20 +47,20 @@ class WebHandler implements WebHandlerInterface
         ),
         400,
       );
-    } catch (NotAllowedException) {
+    } catch (NotAllowedException $exception) {
       return new JsonResponse(
-        traceError(403, 'Not Allowed', null, null),
+        traceError($exception->getCode(), 'Not Allowed', null, null),
         403,
       );
     } catch (UnauthorizedException $exception) {
       return new JsonResponse(
-        traceError(401, 'Unauthorized', null, null),
+        traceError($exception->getCode(), 'Unauthorized', null, null),
         401,
       );
     } catch (Throwable $exception) {
       return new JsonResponse(
         traceError(
-          500,
+          $exception->getCode(),
           "Unknown Error: {$exception->getMessage()}",
           $exception->getFile(),
           $exception->getLine()
